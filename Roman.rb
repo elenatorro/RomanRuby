@@ -1,66 +1,62 @@
 class Conversion
 	def initialize
-		@values = {
-			"I" => 1,
-			"V" => 5,
-			"X" => 10,
-			"L" => 50,
-			"C" => 100,
-			"D" => 500,
-			"M" => 1000
-		}
+		@values = "IVXLCDM"
 
 		@equivalences = {
-			"IIIII" => "V",
-			"VV"    => "X",
-			"XXXXX"	=> "L",
-			"LL"    => "C",
-			"CCCCC" => "D",
-			"DD"    => "M",
-			"VIIII" => "IX"
+			"M" => " DD",
+			"D" => "CCCCC",
+			"C" => "LL",
+			"L" => "XXXXX",
+			"X" => "VV",
+			"V" => "IIIII",
+			"I" => "I"
+		}
+
+		@diff_add = {
+			"DCCCC" => "CM",
+			"CCCC" => "CD",
+			"LXXXX" => "XC",
+			"XXXX" => "XL",
+			"VIIII" => "IX",
+			"IIII" => "IV"
 		}
 	end
 
-	def parse(roman)
-		i = 0
-		result = ""
-		while i < roman.length do
-			if not roman[i+1].nil?
-				if @values[roman[i]].to_i < @values[roman[i+1]].to_i
-					result += "I"*(@values[roman[i+1]].to_i-(1*@values[roman[i]].to_i))
-					i+=1
-				else 
-					result += "I"*(@values[roman[i]].to_i)
-				end
-			else 
-			result += "I"*(@values[roman[i]].to_i)
-			end
-			i+=1
+	#step1
+	def diff_to_add(roman)
+		@diff_add.each do |add, diff|
+			roman.gsub!(diff,add)
 		end
-		result
+		roman
 	end
 
-	def add_romans(roman1,roman2)
-		addition = parse(roman1)+parse(roman2)
+	#step2
+	def merge_and_sort(roman1, roman2)
+		roman1.chars.concat(roman2.chars).sort_by{|n| [@values.index(n)]}.join.reverse
 	end
 
-	def parse_addition(addition)
-		i = 0
-		result = ""
-		ones = ""
-		prev = ""
-		while i < addition.length do
-			ones += addition[i]
-			if @equivalences.has_key?(ones)
-				prev += @equivalences[ones]
-				ones = ""
-				if @equivalences.has_key?(prev)
-					result+=@equivalences[prev]
-					prev = ""
-				end
+	#step3
+	def equivalences(roman)
+		while roman.match(/DD|CCCC|LL|XXXXX|VV|IIIII/) do
+			@equivalences.each do |number,equivalence|
+				roman.gsub!(equivalence,number)
 			end
-			i+=1
 		end
-		result+=prev+=ones
+		roman
+	end
+
+	#step4
+	def add_to_diff(roman)
+		@diff_add.each do |add, diff|
+			roman.gsub!(add,diff)
+		end
+		roman
+	end
+
+	#adition
+	def addition(roman1,roman2)
+		merged = merge_and_sort(diff_to_add(roman1),diff_to_add(roman2))
+		puts merged
+		add_to_diff(equivalences(merge_and_sort(diff_to_add(roman1),diff_to_add(roman2))))
 	end
 end
