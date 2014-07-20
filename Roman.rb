@@ -9,6 +9,16 @@ class Conversion
 			"D" => 500,
 			"M" => 1000
 		}
+
+		@equivalences = {
+			"IIIII" => "V",
+			"VV"    => "X",
+			"XXXXX"	=> "L",
+			"LL"    => "C",
+			"CCCCC" => "D",
+			"DD"    => "M",
+			"VIIII" => "IX"
+		}
 	end
 
 	def parse(roman)
@@ -37,13 +47,20 @@ class Conversion
 	def parse_addition(addition)
 		i = 0
 		result = ""
-		three = 0
+		ones = ""
+		prev = ""
 		while i < addition.length do
-			if not roman[i+1].nil?
-				if not roman[i+2].nil?
-					
+			ones += addition[i]
+			if @equivalences.has_key?(ones)
+				prev += @equivalences[ones]
+				ones = ""
+				if @equivalences.has_key?(prev)
+					result+=@equivalences[prev]
+					prev = ""
 				end
 			end
+			i+=1
 		end
+		result+=prev+=ones
 	end
 end
