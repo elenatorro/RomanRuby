@@ -1,75 +1,52 @@
 require "rspec"
 require_relative "../Roman.rb"
 
-describe "Step one: Convert to I" do
+describe "Step one: Convert differences to additions" do
   before :each do
 		@conversion = Conversion.new
 	end
 
-	it "Convert V to 5I" do
-		expect(@conversion.parse("V")).to eql("I"*5)
+	it "Converts IV to IIII" do
+		expect(@conversion.diff_to_add("IV")).to eq("IIII")
 	end
-
-	it "Convert IV to 4I" do
-		expect(@conversion.parse("IV")).to eql("I"*4)
-	end
-
-	it "Convert IX to 9I" do
-		expect(@conversion.parse("IX")).to eql("I"*9)
-	end
-
-	it "Convert XIX to 19I" do
-		expect(@conversion.parse("XIX")).to eql("I"*19)
-	end
-
-	it "Convert LX to 60I" do
-		expect(@conversion.parse("LX")).to eql("I"*60)
-	end
-
-	it "Convert XX to 20I" do
-		expect(@conversion.parse("XX")).to eql("I"*20)
-	end
-	it "Convert XL to 40I" do
-		expect(@conversion.parse("XL")).to eql("I"*40)
-	end
-	
-	it "Convert XXIV to 24I" do
-		expect(@conversion.parse("XXIV")).to eql("I"*24)
+	it "Converts XIX to XVIIII" do
+		expect(@conversion.diff_to_add("XIX")).to eq("XVIIII")
 	end
 end
 
-describe "Step 2: Add two romans" do
+describe "Step two: Merge and sort two roman numbers" do
+  before :each do
+		@conversion = Conversion.new
+	end
+
+	it "Merge and sort IV and IX into XVII" do
+		expect(@conversion.merge_and_sort("IV","IX")).to eq("XVII")
+	end
+end
+
+describe "Step three: Replace the equivalences for the repetitive numbers" do
 	before :each do
 		@conversion = Conversion.new
 	end
-	
-	it "V add II" do
-		expect(@conversion.add_romans("V","II")).to eq("I"*7)
-	end
-
-	it "CLVI add DCCCLIV" do
-		expect(@conversion.add_romans("CLVI","DCCCLIV")).to eq("I"*1010)
+	it "Replace LLXXXXXVV to CLX" do
+		expect(@conversion.equivalences("LLXXXXXVV")).to eq("CLX")
 	end
 end
 
-describe "Step 3: Convert from I to roman" do
-  before :each do
+describe "Step four: Now invert step 1, replace additions with differences" do
+	before :each do
 		@conversion = Conversion.new
 	end
-	
-	it "IIIII to V" do
-		expect(@conversion.parse_addition("IIIII")).to eq("V")
+	it "Replace XVIIII to XIX" do
+		expect(@conversion.add_to_diff("XVIIII")).to eq("XIX")
 	end
-	it "IIIIII to VI" do
-		expect(@conversion.parse_addition("IIIIII")).to eq("VI")
+end
+
+describe "Final Step! : Add to roman numbers :)" do
+	before :each do
+		@conversion = Conversion.new
 	end
-	it "15I to XV" do
-		expect(@conversion.parse_addition("I"*15)).to eq("XV")
-	end
-	it "26 to XXVI" do
-		expect(@conversion.parse_addition("I"*26)).to eq("XXVI")
-	end
-	it "19I to XIX" do
-		expect(@conversion.parse_addition("I"*19)).to eq("XIX")
+	it "Add " do
+		expect(@conversion.addition("CXLV","LXXIX")).to eq("CCXXIV")
 	end
 end
